@@ -1,0 +1,5 @@
+<h3>{{ object.title }}</h3>
+{% for postimage in post.postimage_set.all%}
+    <img src="{{ postimage.image.url }}" width="300"><br>
+{% endfor %}
+<div>{{ object.content }}</div>

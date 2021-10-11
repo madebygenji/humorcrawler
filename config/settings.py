@@ -25,7 +25,7 @@ SECRET_KEY = '9i-$1ye)#v_%rd50g(qy3$52+12&)6fpu-#fh@=167f$&9i6=m'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.goorm.io']
 
 
 # Application definition
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.naver',
+    'posts',
 ]
 
 MIDDLEWARE = [
@@ -127,6 +128,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, '_media')
+
+MEDIA_URL = '/media/'
 
 
 AUTHENTICATION_BACKENDS = (
