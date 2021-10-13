@@ -1,8 +1,26 @@
-{% for p in object_list %}
-<h3>{{ p.title }}</h3>
-<h4>{{ p.updated }} by {{ p.author }}</h4>
-<p>{{ p.content }}</p>
-<p>
-    --------------
-</p>
-{% endfor %}
+{% extends 'posts/base.html' %}
+
+<h1>{% if category %} <small>:{{ category }}</small>{% endif %}</h1>
+
+{% if title %}
+    {% block title %}{{ title }}{% endblock %}
+{% endif %}
+
+{% block content %}
+<div>
+    
+    <table class="table">
+    {% for p in object_list %}
+    <thead>
+        <tr>
+            <th>
+                <a href="#">{{ p.title }}</a>
+                {{ p.updated }}
+                <a href="#">{{ p.author }}</a>
+            </th>
+        </tr>
+    </thead>
+    {% endfor %}
+    </table>
+</div>
+{% endblock %}

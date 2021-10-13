@@ -1,0 +1,40 @@
+{% load static %}
+<html>
+    <head>
+        <title>유머크롤러</title>
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+        <link href='//fonts.googleapis.com/css?family=Lobster&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="{% static 'css/blog.css' %}">
+    </head>
+    <body>
+        <div class="page-header">
+            <h1><a href="/posts">유머크롤러</a></h1>
+        </div>
+        <div>
+            <ul class="list_unstyled">
+                {% for tag in tag_list %}
+                <li>
+                    <a href="{{ tag.get_absolute_url }}">{{ tag }}</a>
+                </li>
+                {% endfor %}
+                <li>
+                    <a href="/posts/category/_none">미분류({{ posts_without_category }})</a>
+                </li>
+                {% for category in category_list %}
+                <li>
+                    <a href="{{ category.get_absolute_url }}">{{ category }}({{ category.post_set.count }})</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="content container">
+            <div class="row">
+                <div class="col-md-8">
+                {% block content %}
+                {% endblock %}
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

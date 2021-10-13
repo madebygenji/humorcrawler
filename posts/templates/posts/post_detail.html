@@ -1,5 +1,22 @@
-<h3>{{ object.title }}</h3>
-{% for postimage in post.postimage_set.all%}
-    <img src="{{ postimage.image.url }}" width="300"><br>
-{% endfor %}
-<div>{{ object.content }}</div>
+{% extends 'posts/base.html' %}
+{% block content %}
+<div>
+    <table class="table">
+    <thead>
+        <tr>
+            <th>{{ object.title }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                {% for postimage in post.postimage_set.all%}
+                <img src="{{ postimage.image.url }}" width="300"><br>
+                {% endfor %}
+                {{ object.content }}
+            </td>
+        </tr> 
+    </tbody>
+    </table>
+</div>
+{% endblock %}
