@@ -7,14 +7,20 @@
 {% endif %}
 
 {% block content %}
+
 <div>
+    {% if user.is_authenticated %}
+    <button onclick="location.href='posts/create/'">
+        New Post
+    </button>
+    {% endif %}
     
     <table class="table">
     {% for p in object_list %}
     <thead>
         <tr>
             <th>
-                <a href="#">{{ p.title }}</a>
+                <a href="{{ p.get_absolute_url }}">{{ p.title }}</a>
                 {{ p.updated }}
                 <a href="#">{{ p.author }}</a>
             </th>

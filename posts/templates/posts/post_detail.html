@@ -1,22 +1,14 @@
 {% extends 'posts/base.html' %}
 {% block content %}
+
 <div>
-    <table class="table">
-    <thead>
-        <tr>
-            <th>{{ object.title }}</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-                {% for postimage in post.postimage_set.all%}
-                <img src="{{ postimage.image.url }}" width="300"><br>
-                {% endfor %}
-                {{ object.content }}
-            </td>
-        </tr> 
-    </tbody>
-    </table>
+    {{ object.title }}
+    {% if object.head_image %}
+        <img src="{{ object.head_image.url }}" width="300">
+    {% endif %}
+    {{ object.formatted_markdown | safe }}
+    <button type="button" onclick="location.href='{{ object.get_update_url }}'">
+        Edit
+    </button>
 </div>
 {% endblock %}

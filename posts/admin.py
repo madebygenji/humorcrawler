@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Post, PostImage, Category, Tag
+from .models import Post, Category, Tag
+from markdownx.admin import MarkdownxModelAdmin
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -10,15 +11,7 @@ class TagAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name', )}
 
 
-class PostInline(admin.TabularInline):
-    model = PostImage
-
-
-class PostAdmin(admin.ModelAdmin):
-    inlines = [PostInline, ]
-
-
 # Register your models here.
-admin.site.register(Post, PostAdmin)
+admin.site.register(Post, MarkdownxModelAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Tag, TagAdmin)
