@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.naver',
     'posts',
     'markdownx',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [
@@ -162,3 +163,5 @@ MARKDOWNX_MARKDOWN_EXTENSION_CONFIGS = {
 }
 
 MARKDOWNX_MEDIA_PATH = datetime.now().strftime('markdownx/%Y/%m/%d')
+
+CRYSPY_TEMPLATE_PACK = 'bootstrap4'

@@ -1,4 +1,7 @@
 {% extends 'posts/base.html' %}
+
+{% load crispy_forms_tags %}
+
 {% block content %}
 
 <div>
@@ -11,4 +14,30 @@
         Edit
     </button>
 </div>
+
+<form method="post" action="{{ object.get_absolute_url }}new_comment/">
+    {% csrf_token %}
+    {{ comment_form | crispy }}
+    <button type="submit">
+        submit
+    </button>
+</form>
+
+
+{% for comment in object.comment_set.all %}
+    <div id="comment-id-{{ comment.pk }}">
+        <h5>{{ comment.author }}</h5>
+        <p>{{ comment.formatted_markdown | safe }}
+        <small>{{ comment.created }}</small>
+        </p>
+        {% if comment.author == request.user %}
+        <button type="button" onclick="location.href='/posts/update_comment/{{ comment.pk }}'">
+        Edit
+        </button>
+        <button type="button" onclick="location.href='/posts/delete_comment/{{ comment.pk }}'">
+        Delete
+        </button>
+        {% endif %}
+    </div>
+{% endfor %}
 {% endblock %}

@@ -64,3 +64,18 @@ class Post(TimeStampedModel):
 
     class Meta:
         ordering = ['-updated']
+
+
+class Comment(TimeStampedModel):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    text = MarkdownxField()
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.text, self.post
+
+    def formatted_markdown(self):
+        return markdownify(self.text)
+
+    def get_absolute_url(self):
+        return self.post.get_absolute_url() + '#commit-id-{}'.format(self.pk)
