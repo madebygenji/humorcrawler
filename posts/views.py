@@ -1,6 +1,8 @@
 from django.views.generic import ListView, DetailView, UpdateView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
+from django.core.paginator import Paginator
+from django.db.models import Q
 from .models import Post, Category, Tag, Comment
 from .forms import CommentForm
 
@@ -8,6 +10,8 @@ from .forms import CommentForm
 # Create your views here.
 class PostList(ListView):
     model = Post
+    paginate_by = 10
+    ordering = 'created'
 
     def get_queryset(self):
         return Post.objects.order_by('-created')
@@ -18,11 +22,27 @@ class PostList(ListView):
         context['tag_list'] = Tag.objects.all()
         context['posts_without_category'] = Post.objects.filter(category=None).count()
 
+        paginator = context['paginator']
+        page_numbers_range = 5
+        max_index = len(paginator.page_range)
+
+        page = self.request.GET.get('page')
+        current_page = int(page) if page else 1
+
+        start_index = int((current_page - 1) / page_numbers_range) * page_numbers_range
+        end_index = start_index + page_numbers_range
+        if end_index >= max_index:
+            end_index = max_index
+
+        page_range = paginator.page_range[start_index:end_index]
+        context['page_range'] = page_range
+
         return context
 
 
 class PostDetail(DetailView):
     model = Post
+    
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(PostDetail, self).get_context_data(**kwargs)
@@ -69,6 +89,28 @@ class PostCreate(LoginRequiredMixin, CreateView):
         context['tag_list'] = Tag.objects.all()
         context['posts_without_category'] = Post.objects.filter(category=None).count()
 
+        return context
+    
+
+def delete_post(request, pk):
+    post = Post.objects.get(pk=pk)
+
+    if request.user == post.author:
+        post.delete()
+        return redirect('/posts/')
+    else:
+        raise PermissionError('Post 삭제 권한이 없습니다.')
+
+
+class PostSearch(PostList):
+    def get_queryset(self):
+        q = self.kwargs['q']
+        object_list = Post.objects.filter(Q(title__contains=q))
+        return object_list
+        
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(PostSearch, self).get_context_data()
+        context['search_info'] = 'Search: "{}"'.format(self.kwargs['q'])
         return context
 
 
@@ -132,24 +174,24 @@ def new_comment(request, pk):
             return redirect(comment.get_absolute_url())
     else:
         redirect('/posts/')
-      
+
 
 class CommentUpdate(UpdateView):
     model = Comment
     form_class = CommentForm
-    
+
     def get_object(self, queryset=None):
         comment = super(CommentUpdate, self).get_object()
         if comment.author != self.request.user:
             raise PermissionError('Comment 수정 권한이 없습니다.')
-        
+
         return comment
-        
+
 
 def delete_comment(request, pk):
     comment = Comment.objects.get(pk=pk)
     post = comment.post
-    
+
     if request.user == comment.author:
         comment.delete()
         return redirect(post.get_absolute_url() + '#comment-list')

@@ -13,6 +13,9 @@
     <button type="button" onclick="location.href='{{ object.get_update_url }}'">
         Edit
     </button>
+    <button type="button" onclick="location.href='/posts/{{ object.pk }}/delete/'">
+        Delete
+    </button>
 </div>
 
 <form method="post" action="{{ object.get_absolute_url }}new_comment/">
@@ -23,6 +26,7 @@
     </button>
 </form>
 
+<p>댓글개수 : {{ post.comment_set.all.count }}</p>
 
 {% for comment in object.comment_set.all %}
     <div id="comment-id-{{ comment.pk }}">

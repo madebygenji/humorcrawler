@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'posts',
     'markdownx',
     'crispy_forms',
+    'ckeditor',
+    'ckeditor_uploader',
 ]
 
 MIDDLEWARE = [
@@ -163,5 +165,8 @@ MARKDOWNX_MARKDOWN_EXTENSION_CONFIGS = {
 }
 
 MARKDOWNX_MEDIA_PATH = datetime.now().strftime('markdownx/%Y/%m/%d')
+
+CKEDITOR_UPLOAD_PATH = datetime.now().strftime('markdownx/%Y/%m/%d')
+CKEDITOR_IMAGE_BACKEND = "pillow"
 
 CRYSPY_TEMPLATE_PACK = 'bootstrap4'
