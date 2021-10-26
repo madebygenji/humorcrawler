@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from markdownx.models import MarkdownxField
 from markdownx.utils import markdownify
-from ckeditor_uploader.fields import RichTextUploadingField
 
 
 # Create your models here.
@@ -48,7 +47,7 @@ class Post(TimeStampedModel):
     tags = models.ManyToManyField(Tag, blank=True)
     title = models.CharField(max_length=50)
     head_image = models.ImageField(upload_to='posts/%Y/%m/%d', blank=True, null=True)
-    content = RichTextUploadingField(blank=True,null=True)
+    content = MarkdownxField(blank=True,null=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):

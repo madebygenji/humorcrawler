@@ -1,14 +1,34 @@
 {% extends 'posts/base.html' %}
 {% block content %}
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <table>
-        {{ form.as_table }}
-    </table>
-    <button type="submit">
-        Submit
-    </button>
-</form>
+
+
+{% load staticfiles %}
+{% load crispy_forms_tags %}
 
 {{ form.media }}
+<div class="card mb-4">
+    <form class="mb-4" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="card-header"><label for="category">카테고리</label></div>
+        <div class="card-body">{{ form.category }}</div>
+
+        <div class="card-header"><label for="tag">태그</label></div>
+        <div class="card-body">{{ form.tags }}</div>
+
+        <div class="card-header"><label for="title">제목</label></div>
+        <div class="card-body">{{ form.title }}</div>
+
+        <div class="card-header"><label for="head_image">썸네일</label></div>
+        <div class="card-body">{{ form.head_image }}</div>
+
+        <div class="card-header"><label for="content">본문</label></div>
+        <div class="card-body">{{ form.content }}</div>
+
+        <div class="card-body">
+            <button class="btn btn-primary" type="submit">
+                수정완료
+            </button>
+        </div>
+    </form>
+</div>
 {% endblock %}

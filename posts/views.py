@@ -1,7 +1,6 @@
 from django.views.generic import ListView, DetailView, UpdateView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
-from django.core.paginator import Paginator
 from django.db.models import Q
 from .models import Post, Category, Tag, Comment
 from .forms import CommentForm
@@ -10,7 +9,7 @@ from .forms import CommentForm
 # Create your views here.
 class PostList(ListView):
     model = Post
-    paginate_by = 10
+    paginate_by = 5
     ordering = 'created'
 
     def get_queryset(self):
@@ -42,7 +41,6 @@ class PostList(ListView):
 
 class PostDetail(DetailView):
     model = Post
-    
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(PostDetail, self).get_context_data(**kwargs)
@@ -54,7 +52,7 @@ class PostDetail(DetailView):
         return context
 
 
-class PostUpdate(UpdateView):
+class PostUpdate(LoginRequiredMixin, UpdateView):
     model = Post
     fields = [
         'title', 'content', 'head_image', 'category', 'tags'
@@ -90,31 +88,57 @@ class PostCreate(LoginRequiredMixin, CreateView):
         context['posts_without_category'] = Post.objects.filter(category=None).count()
 
         return context
-    
+
 
 def delete_post(request, pk):
-    post = Post.objects.get(pk=pk)
+    if request.user.is_authenticated:
+        post = Post.objects.get(pk=pk)
 
-    if request.user == post.author:
-        post.delete()
-        return redirect('/posts/')
+        if request.user == post.author:
+            post.delete()
+            return redirect('/posts/')
+        else:
+            raise PermissionError('Post 삭제 권한이 없습니다.')
     else:
-        raise PermissionError('Post 삭제 권한이 없습니다.')
+        return redirect('/accounts/login')
 
 
 class PostSearch(PostList):
+    paginate_by = 5
+    
     def get_queryset(self):
         q = self.kwargs['q']
         object_list = Post.objects.filter(Q(title__contains=q))
         return object_list
-        
+
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(PostSearch, self).get_context_data()
         context['search_info'] = 'Search: "{}"'.format(self.kwargs['q'])
+        context['category_list'] = Category.objects.all()
+        context['tag_list'] = Tag.objects.all()
+        context['posts_without_category'] = Post.objects.filter(category=None).count()
+        
+        paginator = context['paginator']
+        page_numbers_range = 5
+        max_index = len(paginator.page_range)
+
+        page = self.request.GET.get('page')
+        current_page = int(page) if page else 1
+
+        start_index = int((current_page - 1) / page_numbers_range) * page_numbers_range
+        end_index = start_index + page_numbers_range
+        if end_index >= max_index:
+            end_index = max_index
+
+        page_range = paginator.page_range[start_index:end_index]
+        context['page_range'] = page_range
+        
         return context
 
 
 class PostListByTag(ListView):
+    paginate_by = 5
+    
     def get_queryset(self):
         tag_slug = self.kwargs['slug']
         tag = Tag.objects.get(slug=tag_slug)
@@ -129,12 +153,28 @@ class PostListByTag(ListView):
 
         slug = self.kwargs['slug']
         context['tag'] = Tag.objects.get(slug=slug)
+        
+        paginator = context['paginator']
+        page_numbers_range = 5
+        max_index = len(paginator.page_range)
+
+        page = self.request.GET.get('page')
+        current_page = int(page) if page else 1
+
+        start_index = int((current_page - 1) / page_numbers_range) * page_numbers_range
+        end_index = start_index + page_numbers_range
+        if end_index >= max_index:
+            end_index = max_index
+
+        page_range = paginator.page_range[start_index:end_index]
+        context['page_range'] = page_range
 
         return context
 
 
 class PostListByCategory(ListView):
-
+    paginate_by = 5
+    
     def get_queryset(self):
         slug = self.kwargs['slug']
 
@@ -157,26 +197,50 @@ class PostListByCategory(ListView):
             context['category'] = '미분류'
         else:
             context['category'] = Category.objects.get(slug=slug)
+            
+        paginator = context['paginator']
+        page_numbers_range = 5
+        max_index = len(paginator.page_range)
+
+        page = self.request.GET.get('page')
+        current_page = int(page) if page else 1
+
+        start_index = int((current_page - 1) / page_numbers_range) * page_numbers_range
+        end_index = start_index + page_numbers_range
+        if end_index >= max_index:
+            end_index = max_index
+
+        page_range = paginator.page_range[start_index:end_index]
+        context['page_range'] = page_range
 
         return context
 
 
 def new_comment(request, pk):
-    post = Post.objects.get(pk=pk)
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(new_comment, self).get_context_data(**kwargs)
+        context['category_list'] = Category.objects.all()
+        context['tag_list'] = Tag.objects.all()
+        context['posts_without_category'] = Post.objects.filter(category=None).count()
+        return context
 
-    if request.method == 'POST':
-        comment_form = CommentForm(request.POST)
-        if comment_form.is_valid():
-            comment = comment_form.save(commit=False)
-            comment.post = post
-            comment.author = request.user
-            comment.save()
-            return redirect(comment.get_absolute_url())
+    if request.user.is_authenticated:
+        post = Post.objects.get(pk=pk)
+        if request.method == 'POST':
+            comment_form = CommentForm(request.POST)
+            if comment_form.is_valid():
+                comment = comment_form.save(commit=False)
+                comment.post = post
+                comment.author = request.user
+                comment.save()
+                return redirect(comment.get_absolute_url())
+        else:
+            return redirect('/posts/')
     else:
-        redirect('/posts/')
+        return redirect('/accounts/login')
 
 
-class CommentUpdate(UpdateView):
+class CommentUpdate(LoginRequiredMixin, UpdateView):
     model = Comment
     form_class = CommentForm
 
@@ -187,13 +251,24 @@ class CommentUpdate(UpdateView):
 
         return comment
 
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(CommentUpdate, self).get_context_data(**kwargs)
+        context['category_list'] = Category.objects.all()
+        context['tag_list'] = Tag.objects.all()
+        context['posts_without_category'] = Post.objects.filter(category=None).count()
+
+        return context
+
 
 def delete_comment(request, pk):
-    comment = Comment.objects.get(pk=pk)
-    post = comment.post
+    if request.user.is_authenticated:
+        comment = Comment.objects.get(pk=pk)
+        post = comment.post
 
-    if request.user == comment.author:
-        comment.delete()
-        return redirect(post.get_absolute_url() + '#comment-list')
+        if request.user == comment.author:
+            comment.delete()
+            return redirect(post.get_absolute_url() + '#comment-list')
+        else:
+            raise PermissionError('Comment 삭제 권한이 없습니다.')
     else:
-        raise PermissionError('Comment 삭제 권한이 없습니다.')
+        return redirect('/accounts/login')

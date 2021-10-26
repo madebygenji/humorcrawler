@@ -1,47 +1,161 @@
+<!DOCTYPE html>
 {% load static %}
 {% load socialaccount %}
-<html>
+<html lang="en">
     <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
         <title>유머크롤러</title>
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
-        <link href='//fonts.googleapis.com/css?family=Lobster&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
-        <link rel="stylesheet" href="{% static 'css/blog.css' %}">
+        <!-- Favicon-->
+        <link rel="icon" type="image/x-icon" href="{% static 'posts/_assets/favicon.ico' %}" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="{% static 'posts/_assets/css/style.css' %}" rel="stylesheet" />
     </head>
     <body>
-        <div class="page-header">
-            <h1><a href="/posts">유머크롤러</a></h1>
-        </div>
-        <div>
-            <ul class="list_unstyled">
-                {% for tag in tag_list %}
-                <li>
-                    <a href="{{ tag.get_absolute_url }}">{{ tag }}</a>
-                </li>
-                {% endfor %}
-                <li>
-                    <a href="/posts/category/_none">미분류({{ posts_without_category }})</a>
-                </li>
-                {% for category in category_list %}
-                <li>
-                    <a href="{{ category.get_absolute_url }}">{{ category }}({{ category.post_set.count }})</a>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-        <div class="content container">
+        <!-- Responsive navbar-->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="/posts">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pin-map-fill" viewBox="0 0 16 16">
+                      <path fill-rule="evenodd" d="M3.1 11.2a.5.5 0 0 1 .4-.2H6a.5.5 0 0 1 0 1H3.75L1.5 15h13l-2.25-3H10a.5.5 0 0 1 0-1h2.5a.5.5 0 0 1 .4.2l3 4a.5.5 0 0 1-.4.8H.5a.5.5 0 0 1-.4-.8l3-4z"/>
+                      <path fill-rule="evenodd" d="M4 4a4 4 0 1 1 4.5 3.969V13.5a.5.5 0 0 1-1 0V7.97A4 4 0 0 1 4 3.999z"/>
+                    </svg>
+                    유머크롤러
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <li class="nav-item"><a class="nav-link" href="/posts">Home</a></li>
+                        {% if user.is_authenticated %}
+                        <li class="nav-item"><a class="nav-link" href="create/">글작성</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/accounts/logout">로그아웃</a></li>
+                        {% else %}
+                        <li class="nav-item"><a class="nav-link" href="/accounts/login">로그인</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/accounts/signup">회원가입</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <!-- Page header with logo and tagline-->
+        <header class="py-5 bg-light border-bottom mb-4">
+            <div class="container">
+                <div class="text-center my-5">
+                    <h1 class="fw-bolder">Welcome to 유머크롤러</h1>
+                    <p class="lead mb-0">게시물은 매일 오전 12시에 업데이트 됩니다.</p>
+                </div>
+            </div>
+        </header>
+        <!-- Page content-->
+        <div class="container">
             <div class="row">
-                <div class="col-md-8">
-                <input type="text" id="search-input" onkeyup="search_enter()" class="form-control" placeholder="Search for...">
-                {% block content %}
-                {% endblock %}
+                <!-- Blog entries-->
+                <div class="col-lg-8">
+                    <!-- Featured blog post-->
+                    {% block content %}
+                    {% endblock %}
+                    <!-- Pagination-->
+                    <nav aria-label="Pagination">
+                        <hr class="my-0" />
+                        <ul class="pagination justify-content-center my-4">
+                        {% if is_paginated %}
+                            {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="/posts/?page={{ page_obj.previous_page_number }}"
+                tabindex="-1">이전</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1">이전</a>
+                            </li>
+                            {% endif %}
+
+                            {% for page in page_range %}
+                            <li class="page-item {% if page == page_obj.number %} disabled {% endif %}">
+                                <a class="page-link" href="/posts/?page={{ page }}">{{ page }}</a>
+                            </li>
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="/posts/?page={{ page_obj.next_page_number }}">다음</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#">다음</a>
+                            </li>
+                            {% endif %}
+                        {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                <!-- Side widgets-->
+                <div class="col-lg-4">
+                    <!-- Search widget-->
+                    <div class="card mb-4">
+                        <div class="card-header">게시글 검색</div>
+                        <div class="card-body">
+                            <div class="input-group">
+                                <input class="form-control" id="search-input" type="text" placeholder="검색할 글 제목을 입력해주세요" aria-label="검색할 글 제목을 입력해주세요" aria-describedby="button-search" onkeyup="search_enter()"/>
+                                <button class="btn btn-primary" id="button-search" type="button" onclick="search_post()">검색</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Categories widget-->
+                    <div class="card mb-4">
+                        <div class="card-header">카테고리</div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <ul class="list-unstyled mb-0">
+                                        {% for tag in tag_list %}
+                                        <li>
+                                            <button class="btn btn-outline-primary" type="button" onclick="location.href='{{ tag.get_absolute_url }}/'">
+                                                {{ tag }}
+                                            </button>
+                                        </li>
+                                        {% endfor %}
+
+                                        {% for category in category_list %}
+                                        <li>
+                                            <button class="btn btn-outline-primary" type="button" onclick="location.href='{{ category.get_absolute_url }}/'">
+                                                {{ category }}({{ category.post_set.count }})
+                                            </button>
+                                        </li>
+                                        {% endfor %}
+
+                                        <li>
+                                            <button class="btn btn-outline-primary" type="button" onclick="location.href='/posts/category/_none'">
+                                                미분류({{ posts_without_category }})
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Side widget-->
+                    <div class="card mb-4">
+                        <div class="card-header">광고</div>
+                        <div class="card-body">You can put anything you want inside of these side widgets. They are easy to use, and feature the Bootstrap 5 card component!</div>
+                    </div>
                 </div>
             </div>
         </div>
+        <!-- Footer-->
+        <footer class="py-5 bg-dark">
+            <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2021</p></div>
+        </footer>
+        <!-- Bootstrap core JS-->
+        <script src="{% static 'posts/bootstrap/bootstrap.bundle.min.js' %}"></script>
+        <!-- Core theme JS-->
+        <script src="{% static 'posts/_assets/js/script.js' %}"></script>
         <script>
             function search_post(){
-               var search_value = document.getElementById('search-input').value;
-               location.href="/posts/search/" + search_value + "/";
+                var search_value = document.getElementById('search-input').value;
+                    location.href="/posts/search/" + search_value + "/";
             }
             
             function search_enter(){
@@ -49,6 +163,6 @@
                     search_post();
                 }
             } 
-        </script> 
+        </script>
     </body>
 </html>

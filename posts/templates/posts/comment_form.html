@@ -1,17 +1,16 @@
 {% extends 'posts/base.html' %}
 {% block content %}
 <h3>
-    Edit Comment : 
+    댓글수정
 </h3>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <table>
-        {{ form.as_table }}
-    </table>
-    <button type="submit">
-        Submit
-    </button>
-</form>
-
 {{ form.media }}
+<form class="mb-4" method="post" action="{{ object.get_absolute_url }}new_comment/">
+    {% csrf_token %}
+    <div class="input-group">
+        <textarea class="form-control" name="text" rows="2" placeholder="댓글을 입력해주세요">{{ comment.text }}</textarea>
+        <button class="btn btn-primary" type="submit">
+            수정완료
+        </button>
+    </div>
+</form>
 {% endblock %}
