@@ -15,6 +15,12 @@ CRUD 커뮤니티 게시판으로 개발방향을 수정하게 되었습니다.
 - 댓글 기능
 
 ## 사용한 기술들(DB, 라이브러리 등등)
+- Postgresql DB : 데이터베이스
+- Django allauth : 로그인, 회원가입
+- MarkdownX : 글작성, 수정시 마크다운 방식으로 작성하기 위함
+- Pillow : 이미지파일(썸네일) 업로드를 위함
+- Bootstrap : 프론트엔드 CSS
+- LoginRequiredMixin : 비로그인시 특정페이지 접근제한
 
 ## 프로젝트 구성
 <img width="203" alt="스크린샷 2021-11-08 오전 9 35 03" src="https://user-images.githubusercontent.com/72113538/140668216-33f707d8-4a9a-4e10-87e3-3d0b9c4090f7.png">
@@ -22,7 +28,7 @@ CRUD 커뮤니티 게시판으로 개발방향을 수정하게 되었습니다.
 ## ER다이어그램(DB구성)
 <img width="799" alt="스크린샷 2021-11-08 오전 9 31 16" src="https://user-images.githubusercontent.com/72113538/140668052-2a6c8e45-da54-44d7-851f-7905e196bd6c.png">
 
-## 코드 리뷰
-
 ## 느낀점
-CRUD게시판의 기본적인 구조를 알 수 있었습니다.
+1. CRUD게시판의 기본적인 백엔드 구조를 이해하게 되었습니다.
+2. CBV기반으로 View를 구성할 수 있게 되었습니다.
+3. 검색, 카테고리, 태그, 댓글등의 부가기능을 구현할 수 있게 되었습니다.
