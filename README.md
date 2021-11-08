@@ -17,8 +17,10 @@ CRUD 커뮤니티 게시판으로 개발방향을 수정하게 되었습니다.
 ## 사용한 기술들(DB, 라이브러리 등등)
 
 ## 프로젝트 구성
+<img width="203" alt="스크린샷 2021-11-08 오전 9 35 03" src="https://user-images.githubusercontent.com/72113538/140668216-33f707d8-4a9a-4e10-87e3-3d0b9c4090f7.png">
 
 ## ER다이어그램(DB구성)
+<img width="799" alt="스크린샷 2021-11-08 오전 9 31 16" src="https://user-images.githubusercontent.com/72113538/140668052-2a6c8e45-da54-44d7-851f-7905e196bd6c.png">
 
 ## 코드 리뷰
 
